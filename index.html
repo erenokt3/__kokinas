@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ceroş</title>
+<style>
+  /* Temel */
+  :root{ --bg: #ffc7df; }
+  html,body{height:100%;margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);overflow:hidden}
+  .stage{position:relative;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+
+  /* UÇAN KALPLER */
+  .heart{position:absolute;width:22px;height:22px;background:#ff6b8a;transform:rotate(45deg);opacity:0.85}
+  .heart:before,.heart:after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:inherit}
+  .heart:before{top:-11px}
+  .heart:after{left:-11px}
+  @keyframes floatUp{0%{transform:translateY(110vh) rotate(45deg)}100%{transform:translateY(-120vh) rotate(45deg)}}
+
+  /* SVG container */
+  .svg-wrap{width:min(1100px,92vw);height:min(1100px,92vh);position:relative}
+  svg{width:100%;height:100%;display:block}
+
+  /* Kurdele üzeri buton (görsel için pointer) */
+  .ribbon-text{cursor:pointer;pointer-events:auto;font-weight:700}
+
+  /* Not kutusu (dinamik olarak eklenir) */
+  .note-box{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:280px;max-width:86vw;background:#fff;border-radius:12px;padding:18px;box-shadow:0 18px 40px rgba(0,0,0,0.18);font-family:"Times New Roman",serif;white-space:pre-line;line-height:1.45}
+
+  /* Tül overlay görseli */
+  .tulle{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:780px;height:640px;pointer-events:none}
+
+  /* Küçük ipucu */
+  .hint{position:absolute;left:50%;top:76%;transform:translateX(-50%);font-size:13px;color:#6b202f}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="svg-wrap">
+    <svg viewBox="0 0 900 900" role="img" aria-label="Gerçekçi kokina buketi">
+      <ellipse cx="450" cy="480" rx="330" ry="360" fill="rgba(255,255,255,0.18)" stroke="#aa0030" stroke-width="3" />
+
+      <g stroke="#083818" stroke-width="12" stroke-linecap="round" fill="none">
+        <path d="M450 700 C420 620 300 470 250 330" />
+        <path d="M450 700 C480 620 600 470 650 330" />
+        <path d="M450 700 C430 630 360 520 330 430" />
+        <path d="M450 700 C470 630 540 520 570 430" />
+      </g>
+
+      <g stroke="#0f6a30" stroke-width="3.5" stroke-linecap="round">
+        <path d="M330 430 C300 390 280 360 260 320" />
+        <path d="M350 420 C340 390 330 360 320 320" />
+        <path d="M300 470 C270 440 250 410 230 380" />
+
+        <path d="M570 430 C600 390 620 360 640 320" />
+        <path d="M550 420 C560 390 570 360 580 320" />
+        <path d="M600 470 C630 440 650 410 670 380" />
+
+        <path d="M410 520 C380 490 350 470 330 450" />
+        <path d="M490 520 C520 490 550 470 570 450" />
+        <path d="M450 560 C430 540 410 520 390 500" />
+      </g>
+
+      <g id="berries" fill="#d40707" stroke="#7a0000" stroke-width="2">
+        <circle cx="310" cy="360" r="12" />
+        <circle cx="340" cy="400" r="11" />
+        <circle cx="370" cy="450" r="13" />
+        <circle cx="390" cy="500" r="12" />
+        <circle cx="420" cy="470" r="14" />
+        <circle cx="450" cy="430" r="13" />
+        <circle cx="480" cy="460" r="12" />
+        <circle cx="520" cy="420" r="13" />
+        <circle cx="550" cy="470" r="14" />
+        <circle cx="580" cy="380" r="12" />
+        <circle cx="600" cy="420" r="11" />
+        <circle cx="360" cy="380" r="10" />
+        <circle cx="430" cy="360" r="12" />
+        <circle cx="470" cy="380" r="11" />
+        <circle cx="510" cy="390" r="12" />
+        <circle cx="450" cy="500" r="14" />
+        <circle cx="480" cy="520" r="12" />
+        <circle cx="420" cy="520" r="11" />
+        <circle cx="390" cy="550" r="9" />
+        <circle cx="520" cy="550" r="9" />
+
+        <circle cx="330" cy="330" r="8" />
+        <circle cx="370" cy="320" r="7" />
+        <circle cx="495" cy="340" r="8" />
+        <circle cx="560" cy="360" r="9" />
+        <circle cx="610" cy="390" r="8" />
+      </g>
+
+      <g id="ribbon" transform="translate(0,0)">
+        <path d="M360 650 Q450 720 540 650" fill="#b80029" />
+        <ellipse cx="450" cy="660" rx="50" ry="30" fill="#ff1d4d" stroke="#7a0020" stroke-width="3" />
+        <text id="ribbonBtn" x="450" y="668" font-size="24" fill="#ffffff" text-anchor="middle" class="ribbon-text" pointer-events="visiblePainted">Tıkla</text>
+      </g>
+
+      <g id="tulle" opacity="0.55" fill="white" pointer-events="none">
+        <path d="M120 200 C220 80 680 80 780 200 L700 620 C580 700 320 700 200 620 Z" fill="white" opacity="0.06" />
+        <path d="M140 230 C230 120 670 120 760 230 L690 600 C585 675 315 675 210 600 Z" fill="white" opacity="0.04" />
+      </g>
+    </svg>
+
+    <svg class="tulle" viewBox="0 0 780 640" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <defs>
+        <radialGradient id="g1" cx="50%" cy="30%">
+          <stop offset="0%" stop-color="#fff" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0.02"/>
+        </radialGradient>
+      </defs>
+      <rect x="0" y="0" width="780" height="640" fill="url(#g1)" opacity="0.06"/>
+      <g fill="#ffffff" opacity="0.02">
+        <circle cx="60" cy="80" r="2"/><circle cx="120" cy="140" r="2"/>
+        <circle cx="200" cy="60" r="2"/><circle cx="350" cy="100" r="2"/>
+        <circle cx="500" cy="140" r="2"/><circle cx="650" cy="80" r="2"/>
+      </g>
+    </svg>
+
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // kalpler
+  for(let i=0;i<28;i++){
+    const h=document.createElement('div');
+    h.className='heart';
+    const size=8 + Math.random()*26;
+    h.style.width=size+'px';
+    h.style.height=size+'px';
+    h.style.left=(Math.random()*92)+'vw';
+    h.style.top=(100 + Math.random()*20)+'vh'; // başlangıç biraz dışarda
+    h.style.opacity=(0.35 + Math.random()*0.6).toFixed(2);
+    h.style.transform='rotate(45deg)';
+    h.style.animation=`floatUp ${6 + Math.random()*6}s linear ${-Math.random()*6}s infinite`;
+    document.body.appendChild(h);
+  }
+})();
+
+// Ribbon button toggle: notu göster/gizle (ON/OFF)
+(function(){
+  const btn = document.getElementById('ribbonBtn');
+  let noteEl = null;
+  let visible = false;
+
+  function createNote(){
+    const el = document.createElement('div');
+    el.className = 'note-box';
+    el.setAttribute('role','dialog');
+    el.setAttribute('aria-label','Sürpriz not');
+    el.innerText = `İlk kokinan ancak,\nNe ilk yılbaşı\nNe son yılbaşı\nHerkesle yeni yıla,\nSenle yıllarımıza,\nErdal Korkmaz'a,\nSelamlar yolla.\n❤️`;
+    return el;
+  }
+
+  function toggleNote(){
+    if(!visible){
+      noteEl = createNote();
+      document.querySelector('.stage').appendChild(noteEl);
+      visible = true;
+      btn.textContent = 'Kapat';
+    } else {
+      if(noteEl){ noteEl.remove(); noteEl = null; }
+      visible = false;
+      btn.textContent = 'Tıkla';
+    }
+  }
+
+  // güvenlik: btn mevcut mu kontrol et
+  if(btn){
+    btn.addEventListener('click', toggleNote);
+  } else {
+    console.warn('Kurdele butonu bulunamadı');
+  }
+})();
+</script>
+
+<audio id="bgMusic" loop>
+  <source src="sarki.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  // Sayfa açıldığında veya herhangi bir yere tıklandığında müziği başlat
+  window.addEventListener('click', function() {
+    var audio = document.getElementById("bgMusic");
+    if(audio.paused) {
+      audio.volume = 0.6; // Ses seviyesi
+      audio.play();
+    }
+  }, { once: true }); // Sadece ilk tıklamada çalışır
+</script>
+
+</body>
+</html>
